@@ -1,4 +1,8 @@
 python-examples
 ===============
 
-Python Examples
+How to run plot-terminal?
+ipython qtconsole --pylab=inline
+ - need packages
+http://qt-project.org/wiki/PySide_Binaries_MacOSX
+pip install -U ipython pyzmq pyside
