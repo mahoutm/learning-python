@@ -6,3 +6,9 @@ ipython qtconsole --pylab=inline
  - need packages
 http://qt-project.org/wiki/PySide_Binaries_MacOSX
 pip install -U ipython pyzmq pyside
+
+How to display with matplotlib on Centos?
+import matplotlib
+matplotlib.use('TkAgg')
+ -- to save image without disply
+matplotlib.use('Agg')
