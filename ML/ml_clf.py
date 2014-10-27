@@ -3,8 +3,11 @@
 
 import numpy as np
 
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
 
 import pickle
 from sklearn.externals import joblib
@@ -24,7 +27,7 @@ def get_train_data():
                        ELSE 0 END as target \
                       ,rep as target_names \
                  FROM water_korea_train;")
-  X=[];Y=[] 
+  X=[];Y=[]
   for rec in cur:
       x,y,z = rec
       X.append(x)
@@ -39,22 +42,22 @@ def get_train_data():
 if __name__ == "__main__":
 
   X, Y = get_train_data() 
+  vec = CountVectorizer()
+  #tfidf = TfidfVectorizer() 
+  tfidf = TfidfTransformer()
+  mnb = MultinomialNB()
 
-  vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=0.5) 
-  
-  X_train = vectorizer.fit_transform(X)
-  X_test  = vectorizer.transform(X[95:120])
-  
-  gnb = GaussianNB()
-  clf = gnb.fit(X_train.toarray(),Y)
-  
+  pip = Pipeline([('Vectorizer', vec),('TF-IDF',tfidf), ('Classifier', mnb)])
+  #pip2 = Pipeline([('Vectorizer', vec), ('TF-IDF',tfidf)])
+ 
+  clf = pip.fit(X,Y)
   joblib.dump(clf, './model/rep.pkl') 
-  clf2 = joblib.load('./model/rep.pkl') 
-  
-  out = clf2.predict(X_test.toarray())
+  clf_new = joblib.load('./model/rep.pkl') 
+
+  out = clf_new.predict(X[95:120])
   
   for i in range(10):
     key = i + 95
     print (str(out[i]) + "   =>    ")
     print (X[key])
-
+    
