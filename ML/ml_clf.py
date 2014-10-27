@@ -42,13 +42,13 @@ def get_train_data():
 if __name__ == "__main__":
 
   X, Y = get_train_data() 
-  vec = CountVectorizer()
-  #tfidf = TfidfVectorizer() 
-  tfidf = TfidfTransformer()
+  #vec = CountVectorizer()
+  #tfidf = TfidfTransformer()
+  tfidf = TfidfVectorizer(sublinear_tf=True, max_df=0.5)
   mnb = MultinomialNB()
 
-  pip = Pipeline([('Vectorizer', vec),('TF-IDF',tfidf), ('Classifier', mnb)])
-  #pip2 = Pipeline([('Vectorizer', vec), ('TF-IDF',tfidf)])
+  #pip = Pipeline([('Vectorizer', vec),('TF-IDF',tfidf), ('Classifier', mnb)])
+  pip = Pipeline([('Vectorizer', tfidf), ('Classifier', mnb)])
  
   clf = pip.fit(X,Y)
   joblib.dump(clf, './model/rep.pkl') 
