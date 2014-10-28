@@ -6,6 +6,28 @@ import urllib2
 import re
 from bs4 import BeautifulSoup
 import numpy as np
+import psycopg2
+from dateutil import parser
+import sys
+
+def put_db (docs):
+
+	try:
+	    conn = psycopg2.connect("dbname='uzeni' user='postgres' host='192.168.50.170' password='ant'")
+	except:
+	    print "I am unable to connect to the database"
+	
+	cur = conn.cursor()
+
+	for i in docs:
+	    cur.execute("INSERT INTO repos_ilbe (num,title,author,wdate,recommend,content) \
+		VALUES (%s,%s,%s,%s,%s,%s)", (i['num'],i['title'],i['author'],parser.parse(i['date']).strftime('%Y-%m-%d %H:%M:%S'),i['recommend'],i['content']) )
+	    for j in i['comments']:
+	    	cur.execute("INSERT INTO repos_ilbe_cmts (num,author,wdate,reply) \
+			VALUES (%s,%s,%s,%s)", (i['num'],j['author'],parser.parse(j['date']).strftime('%Y-%m-%d %H:%M:%S'),j['replyContent']))
+	
+	conn.commit()
+	conn.close()
 
 
 def get_content (url):
@@ -17,14 +39,14 @@ def get_content (url):
 	content = ''
 	comments = []
 
-	print 'find content.'
+	#print 'find content.'
 	for line in bs.body.find_all("div", attrs={"class": re.compile("contentBody") }):
                 row = []
                 for i in line.find_all("p"):
                         row.append(re.sub(r'\s+',' ',i.text.strip()))
                 content = re.sub(r'\s+',' ','\n'.join(row)).strip()
 
-	print 'find comment.'
+	#print 'find comment.'
 	for line in bs.body.find_all("div", attrs={"class":"commentListInner"}):
 	        for i in line.find_all("div", attrs={"class":"replyItem parent_srl_ "}):
 	        	row = {}
@@ -55,7 +77,7 @@ def get_board (url):
 			doc['num'] = key
 		for i in line.find_all("td", attrs={"class":"title"}):
 			for j in  i.find_all('a'):
-				print 'call function.'
+				#print 'call function.'
 				content,comments = get_content(j.get('href'))
                         	doc['content'] = content
                         	doc['comments'] = comments
@@ -71,23 +93,21 @@ def get_board (url):
 
 
 if __name__ == "__main__":
-	
-	#out = get_board('http://www.ilbe.com/index.php?mid=ilbe&page=1')	
-	#for i in out:
-	#	print i['num'],
-	#	print i['title'],
-	#	print i['author'],
-	#	print i['date'],
-	#	print i['recommend']
-	#	print '------content-------'
-	#	print i['content']
-	#	print '------comments------'
-	#	for j in i['comments']:
-	#		print j['author'],
-	#		print j['date'],
-	#		print j['replyContent']
-	#	print '========================================'
+	page = sys.argv	
+	docs = get_board('http://www.ilbe.com/index.php?mid=ilbe&page='+page[1])
+	put_db(docs)
 
-	content, comments = get_content('http://www.ilbe.com/4569410404')
-	print content
-
+# for i in out:
+# print i['num'],
+# print i['title'],
+# print i['author'],
+# print i['date'],
+# print i['recommend']
+# print '------content-------'
+# print i['content']
+# print '------comments------'
+# for j in i['comments']:
+# print j['author'],
+# print j['date'],
+# print j['replyContent']
+# print '========================================
