@@ -1,11 +1,11 @@
 # Get Timeline Tweets with OAuth Authorization
 import tweepy
 
-consumer_key = '0EBFhecaCiAULwgcG9ouIGZ6l'
-consumer_secret = 'spmIzBLO24MqEAQCEoeRlWzqdk37n7fys8JXtI35K4FyUlLoAw'
+consumer_key = '<INPUT>'
+consumer_secret = '<INPUT>'
 
-access_token = '151351809-REDL20AC2HWjTCleqVYWuNYZGhsDRCjd9Y0jtrDH'
-access_token_secret = 'lawyRXJyhz2q4rtBNgiG80nOPsd48389TQlon0YmtwZTd'
+access_token = '<INPUT>'
+access_token_secret = '<INPUT>'
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
